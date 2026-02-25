@@ -14,7 +14,7 @@ COPY server/prisma ./prisma/
 RUN npm install
 COPY server/ .
 RUN npx prisma generate
-RUN npm run build || true # In case there's a build step, otherwise we use ts-node/pm2
+RUN npm run build
 
 # Production Stage
 FROM node:20-alpine
@@ -48,4 +48,4 @@ RUN npm install -g pm2
 
 EXPOSE 80
 
-CMD nginx && pm2-runtime start src/index.ts --interpreter ./node_modules/.bin/ts-node
+CMD nginx && pm2-runtime start dist/index.js
