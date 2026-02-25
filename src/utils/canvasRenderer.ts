@@ -1,4 +1,4 @@
-import { BadgeTemplate, BatchRecord, BadgeLayer } from '../types';
+import { BadgeTemplate, BatchRecord } from '../types';
 
 /**
  * Renders a badge template with specific record data to a high-resolution canvas.

@@ -17,6 +17,8 @@ import BadgeDesigner from './components/BadgeDesigner'
 import DataManager from './components/DataManager'
 import PrinterQueue from './components/PrinterQueue'
 import Login from './components/Login'
+import TemplateDashboard from './components/TemplateDashboard'
+import UserManager from './components/UserManager'
 import { generateBadgesPDF } from './utils/pdfGenerator'
 import { authService, templateService, recordService } from './services/api'
 
@@ -88,7 +90,7 @@ function App() {
     // Load records when template changes
     useEffect(() => {
         if (activeTemplateId) {
-            recordService.getRecords(activeTemplateId).then(res => {
+            recordService.getRecords(activeTemplateId).then((res: { data: BatchRecord[] }) => {
                 setRecords(res.data)
             })
         }
@@ -163,10 +165,37 @@ function App() {
             defaultValue: target.name,
             onConfirm: (newName) => {
                 if (newName && newName.trim()) {
-                    setTemplates(templates.map(t => t.id === id ? { ...t, name: newName } : t))
+                    updateActiveTemplate({ ...target, name: newName })
                 }
             }
         })
+    }
+
+    const handleDeleteTemplate = (id: string) => {
+        const target = templates.find(t => t.id === id)
+        if (!target) return
+
+        setModalConfig({
+            isOpen: true,
+            type: 'confirm',
+            title: 'Excluir Crachá',
+            message: `Tem certeza que deseja excluir o modelo "${target.name}"? Esta ação não poderá ser desfeita.`,
+            onConfirm: async () => {
+                try {
+                    await templateService.deleteTemplate(id)
+                    setTemplates(templates.filter(t => t.id !== id))
+                    if (activeTemplateId === id) setActiveTemplateId(null)
+                } catch (error) {
+                    console.error('Error deleting template:', error)
+                }
+            }
+        })
+    }
+
+    const handleTogglePublic = async (id: string) => {
+        const target = templates.find(t => t.id === id)
+        if (!target) return
+        updateActiveTemplate({ ...target, isPublic: !target.isPublic })
     }
 
     const updateActiveTemplate = async (updates: BadgeTemplate) => {
