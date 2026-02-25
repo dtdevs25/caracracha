@@ -10,6 +10,7 @@ RUN npm run build
 FROM node:20-alpine as backend-build
 WORKDIR /server
 COPY server/package*.json ./
+COPY server/prisma ./prisma/
 RUN npm install
 COPY server/ .
 RUN npx prisma generate
@@ -33,14 +34,14 @@ WORKDIR /app/server
 RUN printf 'server {\n\
     listen 80;\n\
     location / {\n\
-        root /usr/share/nginx/html;\n\
-        index index.html;\n\
-        try_files $uri $uri/ /index.html;\n\
+    root /usr/share/nginx/html;\n\
+    index index.html;\n\
+    try_files $uri $uri/ /index.html;\n\
     }\n\
     location /api {\n\
-        proxy_pass http://localhost:3001;\n\
+    proxy_pass http://localhost:3001;\n\
     }\n\
-}\n' > /etc/nginx/http.d/default.conf
+    }\n' > /etc/nginx/http.d/default.conf
 
 # Install PM2 to run both Nginx and Node
 RUN npm install -g pm2
