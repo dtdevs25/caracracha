@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  MASTER
+  ADMIN
+  USER
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  role      Role     @default(USER)
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  templates BadgeTemplate[]
+
+  @@map("users")
+}
+
+model BadgeTemplate {
+  id          String   @id @default(uuid())
+  name        String
+  ownerId     String   @map("owner_id")
+  owner       User     @relation(fields: [ownerId], references: [id])
+  isPublic    Boolean  @default(false) @map("is_public")
+  orientation String
+  bleed       Float    @default(3)
+  front       Json
+  back        Json
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  records     BatchRecord[]
+
+  @@map("badge_templates")
+}
+
+model BatchRecord {
+  id          String   @id @default(uuid())
+  templateId  String   @map("template_id")
+  template    BadgeTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  data        Json
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("batch_records")
+}

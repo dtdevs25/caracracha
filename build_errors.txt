@@ -1,0 +1,2 @@
+﻿src/components/BadgeDesigner.tsx(10,5): error TS6133: 'Check' is declared but its value is never read.
+src/components/BadgeDesigner.tsx(11,5): error TS6133: 'Plus' is declared but its value is never read.
