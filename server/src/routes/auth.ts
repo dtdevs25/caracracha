@@ -59,7 +59,7 @@ router.post('/users', authenticate, authorize(['MASTER']), async (req, res) => {
 // Delete user (MASTER only)
 router.delete('/users/:id', authenticate, authorize(['MASTER']), async (req, res) => {
     try {
-        await prisma.user.delete({ where: { id: req.params.id } });
+        await prisma.user.delete({ where: { id: req.params.id as string } });
         res.json({ success: true });
     } catch (error) {
         res.status(400).json({ error: 'Could not delete user' });

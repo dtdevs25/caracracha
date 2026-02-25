@@ -9,7 +9,7 @@ const router = express.Router();
 router.get('/:templateId', authenticate, async (req: AuthRequest, res) => {
     try {
         const records = await prisma.batchRecord.findMany({
-            where: { templateId: req.params.templateId },
+            where: { templateId: req.params.templateId as string },
             orderBy: { createdAt: 'desc' }
         });
         res.json(records);
@@ -25,11 +25,11 @@ router.post('/:templateId', authenticate, async (req: AuthRequest, res) => {
     try {
         // Simple strategy: delete existing and recreate for the template
         // Or upsert if IDs are provided.
-        await prisma.batchRecord.deleteMany({ where: { templateId: req.params.templateId } });
+        await prisma.batchRecord.deleteMany({ where: { templateId: req.params.templateId as string } });
 
         const created = await prisma.batchRecord.createMany({
             data: records.map((r: any) => ({
-                templateId: req.params.templateId,
+                templateId: req.params.templateId as string,
                 data: r.data
             }))
         });

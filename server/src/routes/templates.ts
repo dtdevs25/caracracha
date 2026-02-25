@@ -87,12 +87,12 @@ router.post('/', authenticate, async (req: AuthRequest, res) => {
 // Delete template
 router.delete('/:id', authenticate, async (req: AuthRequest, res) => {
     try {
-        const template = await prisma.badgeTemplate.findUnique({ where: { id: req.params.id } });
+        const template = await prisma.badgeTemplate.findUnique({ where: { id: req.params.id as string } });
         if (!template || (template.ownerId !== req.user?.id && req.user?.role !== 'MASTER')) {
             return res.status(403).json({ error: 'Forbidden' });
         }
 
-        await prisma.badgeTemplate.delete({ where: { id: req.params.id } });
+        await prisma.badgeTemplate.delete({ where: { id: req.params.id as string } });
         res.json({ success: true });
     } catch (error) {
         res.status(400).json({ error: 'Could not delete template' });
