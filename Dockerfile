@@ -20,8 +20,8 @@ RUN npm run build
 FROM node:20-alpine
 WORKDIR /app
 
-# Install Nginx to serve frontend
-RUN apk add --no-cache nginx
+# Install Nginx, OpenSSL and compatibility libraries
+RUN apk add --no-cache nginx openssl libc6-compat
 
 # Copy frontend build
 COPY --from=frontend-build /app/dist /usr/share/nginx/html
