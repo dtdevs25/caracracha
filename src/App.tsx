@@ -395,10 +395,19 @@ function App() {
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <img
-                            src="/logo.png"
+                            src="/LogoTopo.png"
                             alt="Logo"
                             style={{ height: '45px', width: 'auto' }}
                         />
+                        <span style={{
+                            marginLeft: '1rem',
+                            fontSize: '1.2rem',
+                            fontWeight: 900,
+                            color: '#1e293b',
+                            letterSpacing: '-0.5px'
+                        }}>
+                            Cara Crachá - Sistema de Identificação
+                        </span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                         <div style={{ color: '#475569', fontSize: '0.95rem', fontWeight: 700 }}>

@@ -59,6 +59,7 @@ router.get('/', authenticate, async (req: AuthRequest, res) => {
 // Create/Update template
 router.post('/', authenticate, async (req: AuthRequest, res) => {
     const { id, name, isPublic, orientation, bleed, front, back } = req.body;
+    console.log('Template Upsert Request:', { id, name });
 
     try {
         const data = {
@@ -71,13 +72,16 @@ router.post('/', authenticate, async (req: AuthRequest, res) => {
             ownerId: req.user!.id
         };
 
+        const isValidUuid = (uuid: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(uuid);
+
         let template;
-        if (id) {
+        if (id && isValidUuid(id)) {
             template = await prisma.badgeTemplate.update({
                 where: { id },
                 data
             });
         } else {
+            console.log('Creating new template (no valid ID provided)');
             template = await prisma.badgeTemplate.create({
                 data
             });

@@ -54,7 +54,7 @@ export default function Login({ onLogin }: LoginProps) {
                     alignItems: 'center'
                 }}>
                     <img
-                        src="/logo.png"
+                        src="/LogoTopo.png"
                         alt="Cara Crachá"
                         style={{
                             height: '100px',
