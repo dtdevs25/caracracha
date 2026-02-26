@@ -7,9 +7,12 @@ const router = express.Router();
 
 // Get records for the authenticated user
 router.get('/', authenticate, async (req: AuthRequest, res) => {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: 'Unauthorized' });
+
     try {
         const records = await prisma.batchRecord.findMany({
-            where: { userId: req.user.id },
+            where: { userId: user.id },
             orderBy: { createdAt: 'desc' }
         });
         res.json(records);
@@ -21,8 +24,11 @@ router.get('/', authenticate, async (req: AuthRequest, res) => {
 
 // Save/Update records for the authenticated user
 router.post('/', authenticate, async (req: AuthRequest, res) => {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: 'Unauthorized' });
+
     const { records } = req.body; // Array of { id?, data }
-    const userId = req.user.id;
+    const userId = user.id;
 
     console.log(`[Records] Saving ${records?.length || 0} records for user ${userId}`);
 
