@@ -67,6 +67,7 @@ export default function DataManager({ records, onUpdate, onColumnsDetected, avai
         console.log('[DataManager] Adding new row');
         const newRecord: BatchRecord = {
             id: crypto.randomUUID(),
+            groupName: '',
             data: {}
         }
         availableColumns.forEach(col => newRecord.data[col] = '')
@@ -76,6 +77,13 @@ export default function DataManager({ records, onUpdate, onColumnsDetected, avai
     const handleUpdateCell = (rowId: string, col: string, value: string) => {
         const updated = records.map(r =>
             r.id === rowId ? { ...r, data: { ...r.data, [col]: value } } : r
+        )
+        onUpdate(updated)
+    }
+
+    const handleUpdateGroup = (rowId: string, group: string) => {
+        const updated = records.map(r =>
+            r.id === rowId ? { ...r, groupName: group } : r
         )
         onUpdate(updated)
     }
@@ -145,7 +153,9 @@ export default function DataManager({ records, onUpdate, onColumnsDetected, avai
                     }
                     recordData[header] = String(val ?? '')
                 })
-                return { id: crypto.randomUUID(), data: recordData }
+                // Extract groupName from a specific column if it exists, or leave empty
+                const groupName = (row['Grupo'] || row['grupo'] || '').toString()
+                return { id: crypto.randomUUID(), groupName, data: recordData }
             })
             onUpdate(newRecords)
         }
@@ -197,6 +207,11 @@ export default function DataManager({ records, onUpdate, onColumnsDetected, avai
                         <thead>
                             <tr style={{ background: '#f8fafc', borderBottom: '1px solid var(--border-color)' }}>
                                 <th style={{ padding: '1rem', width: '50px' }}>#</th>
+                                <th style={{ padding: '1rem', minWidth: '150px' }}>
+                                    <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--accent-color)' }}>
+                                        Grupo / Turma
+                                    </span>
+                                </th>
                                 {availableColumns.map(col => (
                                     <th key={col} style={{ padding: '1rem', minWidth: '150px' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
@@ -229,6 +244,15 @@ export default function DataManager({ records, onUpdate, onColumnsDetected, avai
                             {records.map((record, idx) => (
                                 <tr key={record.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                                     <td style={{ padding: '1rem', color: '#cbd5e1', fontSize: '0.8rem' }}>{(idx + 1).toString()}</td>
+                                    <td style={{ padding: '0.5rem 1rem' }}>
+                                        <input
+                                            className="input"
+                                            placeholder="Ex: CIPA 2026"
+                                            value={record.groupName || ''}
+                                            onChange={(e) => handleUpdateGroup(record.id, e.target.value)}
+                                            style={{ margin: 0, padding: '0.4rem', fontSize: '0.85rem', fontWeight: 600, border: '1px dashed var(--border-color)' }}
+                                        />
+                                    </td>
                                     {availableColumns.map(col => (
                                         <td key={col} style={{ padding: '0.5rem 1rem' }}>
                                             {record.data[col]?.startsWith('data:image') ? (

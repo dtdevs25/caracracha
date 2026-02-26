@@ -43,10 +43,12 @@ export interface BadgeTemplate {
         background: string | null;
         layers: BadgeLayer[];
     };
+    targetGroup?: string | null;
 }
 
 export interface BatchRecord {
     id: string;
+    groupName?: string | null;
     data: Record<string, string>;
 }
 

@@ -273,8 +273,8 @@ label {
 .zoom-controls {
   position: fixed;
   bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
+  left: calc(50% + 4.25rem);
+  /* Offset to compensate for sidebar */
   display: flex;
   align-items: center;
   gap: 1.5rem;

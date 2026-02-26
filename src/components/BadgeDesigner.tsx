@@ -17,7 +17,8 @@ import {
     Triangle,
     Layout,
     Globe,
-    Lock as LockIcon
+    Lock as LockIcon,
+    Users
 } from 'lucide-react'
 import { BadgeTemplate, BadgeLayer, BatchRecord } from '../types'
 import { templateService } from '../services/api'
@@ -151,6 +152,7 @@ interface BadgeDesignerProps {
     template: BadgeTemplate;
     onUpdate: (template: BadgeTemplate) => void;
     availableColumns: string[];
+    allGroups?: string[];
     minimal?: boolean;
     side?: 'front' | 'back';
     record?: BatchRecord;
@@ -160,6 +162,7 @@ export default function BadgeDesigner({
     template,
     onUpdate,
     availableColumns,
+    allGroups = [],
     minimal = false,
     side,
     record
@@ -846,6 +849,45 @@ export default function BadgeDesigner({
                                                 transition: 'all 0.3s',
                                                 boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                                             }} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style={{ padding: '0 1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                    <div style={{ padding: '1rem', background: 'rgba(99, 102, 241, 0.05)', borderRadius: '1rem', border: '1px solid rgba(99, 102, 241, 0.1)' }}>
+                                        <h4 style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--accent-color)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            <Users size={16} /> VINCULAR GRUPO
+                                        </h4>
+                                        <select
+                                            className="input"
+                                            value={template.targetGroup || ''}
+                                            onChange={(e) => onUpdate({ ...template, targetGroup: e.target.value || null })}
+                                            style={{ background: 'white', fontWeight: 700, fontSize: '0.85rem' }}
+                                        >
+                                            <option value="">Mostrar Todos (Sem filtro)</option>
+                                            {allGroups.map(group => (
+                                                <option key={group} value={group}>{group}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label style={{ fontSize: '0.75rem' }}>Orientação do Crachá</label>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginTop: '0.4rem' }}>
+                                            <button
+                                                className={`btn ${isVertical ? 'btn-primary' : 'btn-ghost'}`}
+                                                onClick={() => onUpdate({ ...template, orientation: 'vertical' })}
+                                                style={{ fontSize: '0.7rem', height: '32px' }}
+                                            >
+                                                Vertical
+                                            </button>
+                                            <button
+                                                className={`btn ${!isVertical ? 'btn-primary' : 'btn-ghost'}`}
+                                                onClick={() => onUpdate({ ...template, orientation: 'horizontal' })}
+                                                style={{ fontSize: '0.7rem', height: '32px' }}
+                                            >
+                                                Horizontal
+                                            </button>
                                         </div>
                                     </div>
                                 </div>

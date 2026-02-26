@@ -37,6 +37,7 @@ model BadgeTemplate {
   bleed       Float    @default(3)
   front       Json
   back        Json
+  targetGroup String?  @map("target_group")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
@@ -47,6 +48,7 @@ model BatchRecord {
   id        String   @id @default(uuid())
   userId    String?  @map("user_id")
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  groupName String?  @map("group_name")
   data      Json
   createdAt DateTime @default(now()) @map("created_at")
 

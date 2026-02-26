@@ -58,8 +58,8 @@ router.get('/', authenticate, async (req: AuthRequest, res) => {
 
 // Create/Update template
 router.post('/', authenticate, async (req: AuthRequest, res) => {
-    const { id, name, isPublic, orientation, bleed, front, back } = req.body;
-    console.log('Template Upsert Request:', { id, name });
+    const { id, name, isPublic, orientation, bleed, front, back, targetGroup } = req.body;
+    console.log('Template Upsert Request:', { id, name, targetGroup });
 
     try {
         const data = {
@@ -69,6 +69,7 @@ router.post('/', authenticate, async (req: AuthRequest, res) => {
             bleed,
             front,
             back,
+            targetGroup,
             ownerId: req.user!.id
         };
 

@@ -61,6 +61,11 @@ function App() {
 
     const activeTemplate = templates.find(t => t.id === activeTemplateId) || templates[0]
 
+    const allGroups = Array.from(new Set(records.map(r => r.groupName).filter(Boolean))) as string[];
+    const filteredRecords = activeTemplate?.targetGroup
+        ? records.filter(r => r.groupName === activeTemplate.targetGroup)
+        : records;
+
     // Load Initial Data
     useEffect(() => {
         if (currentUser) {
@@ -244,7 +249,7 @@ function App() {
 
         setIsDownloadingPDF(true);
         try {
-            await generateBadgesPDF(activeTemplate, records, (progress: number) => {
+            await generateBadgesPDF(activeTemplate, filteredRecords, (progress: number) => {
                 console.log(`Progresso PDF: ${progress}%`);
             });
         } catch (error) {
@@ -473,6 +478,7 @@ function App() {
                                 template={activeTemplate}
                                 onUpdate={updateActiveTemplate}
                                 availableColumns={columns}
+                                allGroups={allGroups}
                             />
                         </motion.div>
                     )}
@@ -505,7 +511,7 @@ function App() {
                         >
                             <PrinterQueue
                                 template={activeTemplate}
-                                records={records}
+                                records={filteredRecords}
                                 onUpdateTemplate={updateActiveTemplate}
                             />
                         </motion.div>

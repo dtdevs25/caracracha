@@ -46,6 +46,7 @@ router.post('/', authenticate, async (req: AuthRequest, res) => {
                 return await tx.batchRecord.createMany({
                     data: records.map((r: any) => ({
                         userId,
+                        groupName: r.groupName || null,
                         data: r.data || {}
                     }))
                 });
