@@ -213,15 +213,15 @@ export default function BadgeDesigner({
 
         try {
             const res = await templateService.uploadImage(formData)
-            const fileName = res.data.fileName
+            const { url } = res.data
 
             if (uploadMode === 'background') {
                 onUpdate({
                     ...template,
-                    [activeSide]: { ...template[activeSide], background: fileName }
+                    [activeSide]: { ...template[activeSide], background: url }
                 })
             } else {
-                addLayer('image', fileName)
+                addLayer('image', url)
             }
         } catch (error) {
             console.error('Error uploading image:', error)

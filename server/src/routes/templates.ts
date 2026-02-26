@@ -8,6 +8,38 @@ import { AuthRequest } from '../middleware/auth.js';
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
+const bucketName = process.env.MINIO_BUCKET_NAME || 'caracracha-design';
+
+// Helper to resolve MinIO URLs in templates
+async function resolveTemplateUrls(t: any) {
+    const front = t.front as any;
+    const back = t.back as any;
+
+    const resolveSide = async (side: any) => {
+        if (!side) return side;
+        // Resolve background
+        if (side.background && !side.background.startsWith('http')) {
+            side.background = await getFileUrl(side.background);
+        }
+        // Resolve image layers
+        if (side.layers) {
+            side.layers = await Promise.all(side.layers.map(async (l: any) => {
+                if (l.type === 'image' && l.content && !l.content.startsWith('http')) {
+                    return { ...l, content: await getFileUrl(l.content) };
+                }
+                return l;
+            }));
+        }
+        return side;
+    };
+
+    return {
+        ...t,
+        front: await resolveSide(front),
+        back: await resolveSide(back)
+    };
+}
+
 // Upload background image
 router.post('/upload', authenticate, upload.single('image'), async (req: AuthRequest, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
@@ -35,20 +67,8 @@ router.get('/', authenticate, async (req: AuthRequest, res) => {
             orderBy: { updatedAt: 'desc' }
         });
 
-        // Resolve MinIO URLs for backgrounds
-        const resolvedTemplates = await Promise.all(templates.map(async (t: any) => {
-            const frontBg = t.front as any;
-            const backBg = t.back as any;
-
-            if (frontBg.background && !frontBg.background.startsWith('http')) {
-                frontBg.background = await getFileUrl(frontBg.background);
-            }
-            if (backBg.background && !backBg.background.startsWith('http')) {
-                backBg.background = await getFileUrl(backBg.background);
-            }
-
-            return { ...t, front: frontBg, back: backBg };
-        }));
+        // Resolve MinIO URLs for all image fields
+        const resolvedTemplates = await Promise.all(templates.map(resolveTemplateUrls));
 
         res.json(resolvedTemplates);
     } catch (error) {
@@ -88,7 +108,8 @@ router.post('/', authenticate, async (req: AuthRequest, res) => {
             });
         }
 
-        res.json(template);
+        const resolved = await resolveTemplateUrls(template);
+        res.json(resolved);
     } catch (error) {
         console.error(error);
         res.status(400).json({ error: 'Invalid template data' });
