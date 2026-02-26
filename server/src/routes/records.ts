@@ -21,22 +21,39 @@ router.get('/:templateId', authenticate, async (req: AuthRequest, res) => {
 // Save/Update records
 router.post('/:templateId', authenticate, async (req: AuthRequest, res) => {
     const { records } = req.body; // Array of { id?, data }
+    const { templateId } = req.params;
+
+    console.log(`[Records] Saving ${records?.length || 0} records for template ${templateId}`);
 
     try {
-        // Simple strategy: delete existing and recreate for the template
-        // Or upsert if IDs are provided.
-        await prisma.batchRecord.deleteMany({ where: { templateId: req.params.templateId as string } });
+        if (!Array.isArray(records)) {
+            return res.status(400).json({ error: 'Records must be an array' });
+        }
 
-        const created = await prisma.batchRecord.createMany({
-            data: records.map((r: any) => ({
-                templateId: req.params.templateId as string,
-                data: r.data
-            }))
+        const result = await prisma.$transaction(async (tx) => {
+            // Delete existing records for this template
+            await tx.batchRecord.deleteMany({ where: { templateId } });
+
+            // Create new records
+            if (records.length > 0) {
+                return await tx.batchRecord.createMany({
+                    data: records.map((r: any) => ({
+                        templateId,
+                        data: r.data || {}
+                    }))
+                });
+            }
+            return { count: 0 };
         });
 
-        res.json({ count: created.count });
-    } catch (error) {
-        res.status(400).json({ error: 'Invalid records data' });
+        console.log(`[Records] Successfully saved ${result.count} records`);
+        res.json({ count: result.count });
+    } catch (error: any) {
+        console.error('[Records] Error saving records:', error);
+        res.status(500).json({
+            error: 'Failed to save records',
+            details: error.message
+        });
     }
 });
 

@@ -208,12 +208,17 @@ function App() {
     }
 
     const saveRecords = async (newRecords: BatchRecord[]) => {
-        if (!activeTemplateId) return
+        if (!activeTemplateId) {
+            console.warn('[App] Cannot save records: No activeTemplateId');
+            return;
+        }
+        console.log(`[App] Saving ${newRecords.length} records for template ${activeTemplateId}`);
         try {
             await recordService.saveRecords(activeTemplateId, newRecords)
             setRecords(newRecords)
+            console.log('[App] Records saved successfully');
         } catch (error) {
-            console.error('Error saving records:', error)
+            console.error('[App] Error saving records:', error)
         }
     }
 

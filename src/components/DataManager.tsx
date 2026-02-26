@@ -64,6 +64,7 @@ export default function DataManager({ records, onUpdate, onColumnsDetected, avai
     }
 
     const handleAddRow = () => {
+        console.log('[DataManager] Adding new row');
         const newRecord: BatchRecord = {
             id: crypto.randomUUID(),
             data: {}
