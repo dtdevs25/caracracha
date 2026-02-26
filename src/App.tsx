@@ -208,17 +208,24 @@ function App() {
     }
 
     const saveRecords = async (newRecords: BatchRecord[]) => {
+        console.log('[App] saveRecords called with:', newRecords.length, 'records');
         if (!activeTemplateId) {
-            console.warn('[App] Cannot save records: No activeTemplateId');
+            console.warn('[App] Cannot save records: No activeTemplateId. ActiveTab is:', activeTab);
             return;
         }
-        console.log(`[App] Saving ${newRecords.length} records for template ${activeTemplateId}`);
+        console.log(`[App] Attempting to save records for template: ${activeTemplateId}`);
         try {
-            await recordService.saveRecords(activeTemplateId, newRecords)
+            const response = await recordService.saveRecords(activeTemplateId, newRecords)
+            console.log('[App] API response for saveRecords:', response);
             setRecords(newRecords)
-            console.log('[App] Records saved successfully');
+            console.log('[App] Frontend records state updated successfully');
         } catch (error) {
-            console.error('[App] Error saving records:', error)
+            console.error('[App] Error in saveRecords flow:', error)
+            requestModal({
+                type: 'alert',
+                title: 'Erro ao Salvar',
+                message: 'Não foi possível salvar os registros. Verifique o console para mais detalhes.'
+            });
         }
     }
 
