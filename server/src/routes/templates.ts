@@ -36,7 +36,7 @@ router.get('/', authenticate, async (req: AuthRequest, res) => {
         });
 
         // Resolve MinIO URLs for backgrounds
-        const resolvedTemplates = await Promise.all(templates.map(async (t) => {
+        const resolvedTemplates = await Promise.all(templates.map(async (t: any) => {
             const frontBg = t.front as any;
             const backBg = t.back as any;
 
