@@ -632,37 +632,37 @@ export default function BadgeDesigner({
                         </div>
                     </div>
                 </div>
+            </div>
 
-                {/* Navigation Notch - Only if not minimal */}
-                {!minimal && (
-                    <div className="zoom-controls">
-                        <div className="side-label">
-                            {activeSide === 'front' ? 'FRENTE' : 'VERSO'}
-                        </div>
-                        <button className="zoom-btn" onClick={handleFlip} data-tooltip="Trocar Lado (Frente/Verso)">
-                            <Rotate3d size={20} />
+            {/* Navigation Notch - Moved out of workspace for absolute positioning at bottom */}
+            {!minimal && (
+                <div className="zoom-controls">
+                    <div className="side-label">
+                        {activeSide === 'front' ? 'FRENTE' : 'VERSO'}
+                    </div>
+                    <button className="zoom-btn" onClick={handleFlip} data-tooltip="Trocar Lado (Frente/Verso)">
+                        <Rotate3d size={20} />
+                    </button>
+
+                    <div style={{ width: '1px', background: 'var(--border-color)', height: '24px' }} />
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <button className="zoom-btn" onClick={() => setUserZoom(Math.max(0.5, userZoom - 0.1))} data-tooltip="Diminuir Zoom">
+                            <ZoomOut size={18} />
                         </button>
-
-                        <div style={{ width: '1px', background: 'var(--border-color)', height: '24px' }} />
-
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <button className="zoom-btn" onClick={() => setUserZoom(Math.max(0.5, userZoom - 0.1))} data-tooltip="Diminuir Zoom">
-                                <ZoomOut size={18} />
-                            </button>
-                            <div className="zoom-val">{Math.round(userZoom * 100)}%</div>
-                            <button className="zoom-btn" onClick={() => setUserZoom(Math.min(2.5, userZoom + 0.1))} data-tooltip="Aumentar Zoom">
-                                <ZoomIn size={18} />
-                            </button>
-                        </div>
-
-                        <div style={{ width: '1px', background: 'var(--border-color)', height: '24px' }} />
-
-                        <button className="zoom-btn" onClick={() => onUpdate({ ...template, orientation: isVertical ? 'horizontal' : 'vertical' })} data-tooltip="Girar Orientação (Alt/Larg)">
-                            <RefreshCw size={20} />
+                        <div className="zoom-val">{Math.round(userZoom * 100)}%</div>
+                        <button className="zoom-btn" onClick={() => setUserZoom(Math.min(2.5, userZoom + 0.1))} data-tooltip="Aumentar Zoom">
+                            <ZoomIn size={18} />
                         </button>
                     </div>
-                )}
-            </div>
+
+                    <div style={{ width: '1px', background: 'var(--border-color)', height: '24px' }} />
+
+                    <button className="zoom-btn" onClick={() => onUpdate({ ...template, orientation: isVertical ? 'horizontal' : 'vertical' })} data-tooltip="Girar Orientação (Alt/Larg)">
+                        <RefreshCw size={20} />
+                    </button>
+                </div>
+            )}
 
             {/* Guidance Modal */}
             {!minimal && (

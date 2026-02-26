@@ -191,14 +191,26 @@ function App() {
         updateActiveTemplate({ ...target, isPublic: !target.isPublic })
     }
 
-    const updateActiveTemplate = async (updates: BadgeTemplate) => {
-        try {
-            const res = await templateService.saveTemplate(updates)
-            setTemplates(templates.map(t => t.id === updates.id ? res.data : t))
-        } catch (error) {
-            console.error('Error updating template:', error)
-        }
-    }
+    const updateActiveTemplate = (updates: BadgeTemplate) => {
+        // Update local state immediately for snappy UI
+        setTemplates(prev => prev.map(t => t.id === updates.id ? updates : t));
+    };
+
+    // Debounced Auto-save Effect
+    useEffect(() => {
+        if (!activeTemplate || activeTemplate.id === 'default' || !currentUser) return;
+
+        const timer = setTimeout(async () => {
+            try {
+                await templateService.saveTemplate(activeTemplate);
+                console.log('[App] Auto-saved template:', activeTemplate.name);
+            } catch (error) {
+                console.error('Error auto-saving template:', error);
+            }
+        }, 800); // 800ms debounce
+
+        return () => clearTimeout(timer);
+    }, [activeTemplate, currentUser]);
 
     const saveRecords = async (newRecords: BatchRecord[]) => {
         console.log('[App] saveRecords called with:', newRecords.length, 'records');
