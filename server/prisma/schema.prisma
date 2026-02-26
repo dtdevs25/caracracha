@@ -45,8 +45,8 @@ model BadgeTemplate {
 
 model BatchRecord {
   id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String?  @map("user_id")
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   data      Json
   createdAt DateTime @default(now()) @map("created_at")
 

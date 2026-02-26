@@ -48,4 +48,4 @@ RUN npm install -g pm2
 
 EXPOSE 80
 
-CMD npx prisma db push --accept-data-loss && nginx && pm2-runtime start dist/index.js
+CMD npx prisma db push --accept-data-loss ; nginx && pm2-runtime start dist/index.js
