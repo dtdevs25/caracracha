@@ -67,12 +67,14 @@ function App() {
             const fetchData = async () => {
                 setIsLoading(true)
                 try {
-                    const [templatesRes, usersRes] = await Promise.all([
+                    const [templatesRes, usersRes, recordsRes] = await Promise.all([
                         templateService.getTemplates(),
-                        currentUser.role === 'MASTER' ? authService.getUsers() : Promise.resolve({ data: [] })
+                        currentUser.role === 'MASTER' ? authService.getUsers() : Promise.resolve({ data: [] }),
+                        recordService.getRecords()
                     ])
                     setTemplates(templatesRes.data)
                     setUsers(usersRes.data)
+                    setRecords(recordsRes.data)
                 } catch (error) {
                     console.error('Error fetching data:', error)
                 } finally {
@@ -86,15 +88,6 @@ function App() {
             localStorage.removeItem('badge_token')
         }
     }, [currentUser])
-
-    // Load records when template changes
-    useEffect(() => {
-        if (activeTemplateId) {
-            recordService.getRecords(activeTemplateId).then((res: { data: BatchRecord[] }) => {
-                setRecords(res.data)
-            })
-        }
-    }, [activeTemplateId])
 
     useEffect(() => {
         localStorage.setItem('badge_columns', JSON.stringify(columns))
@@ -209,13 +202,9 @@ function App() {
 
     const saveRecords = async (newRecords: BatchRecord[]) => {
         console.log('[App] saveRecords called with:', newRecords.length, 'records');
-        if (!activeTemplateId) {
-            console.warn('[App] Cannot save records: No activeTemplateId. ActiveTab is:', activeTab);
-            return;
-        }
-        console.log(`[App] Attempting to save records for template: ${activeTemplateId}`);
+        console.log(`[App] Attempting to save global user records`);
         try {
-            const response = await recordService.saveRecords(activeTemplateId, newRecords)
+            const response = await recordService.saveRecords(newRecords)
             console.log('[App] API response for saveRecords:', response);
             setRecords(newRecords)
             console.log('[App] Frontend records state updated successfully');

@@ -30,8 +30,8 @@ export const templateService = {
 };
 
 export const recordService = {
-    getRecords: (templateId: string) => api.get(`/records/${templateId}`),
-    saveRecords: (templateId: string, records: any[]) => api.post(`/records/${templateId}`, { records })
+    getRecords: () => api.get('/records'),
+    saveRecords: (records: any[]) => api.post('/records', { records })
 };
 
 export default api;

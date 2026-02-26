@@ -5,25 +5,26 @@ import { AuthRequest } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Get records for a template
-router.get('/:templateId', authenticate, async (req: AuthRequest, res) => {
+// Get records for the authenticated user
+router.get('/', authenticate, async (req: AuthRequest, res) => {
     try {
         const records = await prisma.batchRecord.findMany({
-            where: { templateId: req.params.templateId as string },
+            where: { userId: req.user.id },
             orderBy: { createdAt: 'desc' }
         });
         res.json(records);
     } catch (error) {
+        console.error('[Records] Error fetching records:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-// Save/Update records
-router.post('/:templateId', authenticate, async (req: AuthRequest, res) => {
+// Save/Update records for the authenticated user
+router.post('/', authenticate, async (req: AuthRequest, res) => {
     const { records } = req.body; // Array of { id?, data }
-    const { templateId } = req.params;
+    const userId = req.user.id;
 
-    console.log(`[Records] Saving ${records?.length || 0} records for template ${templateId}`);
+    console.log(`[Records] Saving ${records?.length || 0} records for user ${userId}`);
 
     try {
         if (!Array.isArray(records)) {
@@ -31,15 +32,14 @@ router.post('/:templateId', authenticate, async (req: AuthRequest, res) => {
         }
 
         const result = await prisma.$transaction(async (tx: any) => {
-            const id = req.params.templateId as string;
-            // Delete existing records for this template
-            await tx.batchRecord.deleteMany({ where: { templateId: id } });
+            // Delete existing records for this user
+            await tx.batchRecord.deleteMany({ where: { userId } });
 
             // Create new records
             if (records.length > 0) {
                 return await tx.batchRecord.createMany({
                     data: records.map((r: any) => ({
-                        templateId: id,
+                        userId,
                         data: r.data || {}
                     }))
                 });
