@@ -221,7 +221,8 @@ function App() {
             console.log('[App] Frontend records state updated successfully');
         } catch (error) {
             console.error('[App] Error in saveRecords flow:', error)
-            requestModal({
+            setModalConfig({
+                isOpen: true,
                 type: 'alert',
                 title: 'Erro ao Salvar',
                 message: 'Não foi possível salvar os registros. Verifique o console para mais detalhes.'
