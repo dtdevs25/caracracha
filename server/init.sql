@@ -36,7 +36,7 @@ CREATE TABLE "batch_records" (
 );
 
 -- Initial Master User
--- Password is '123' hashed (you should change this)
+-- Password is 'nova@2026' hashed
 INSERT INTO "users" ("username", "password", "role", "name")
-VALUES ('master', '$2b$10$EpRnTzZlqH1u1E2E2.5e0.C/5qfG6A15K8L7J3z3k3.3k3.3k3.3k', 'MASTER', 'Usuário Master')
+VALUES ('dsantos@ctdi.com', '$2b$10$Z.R2G8RieJ/dDvx9JNLoyO0vHBxzRuwZp8S337StfyLvtstKBJHEO', 'MASTER', 'Usuário Master')
 ON CONFLICT ("username") DO NOTHING;

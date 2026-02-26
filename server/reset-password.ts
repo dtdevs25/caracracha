@@ -4,11 +4,11 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function resetPassword() {
-    const username = 'master';
-    const newPassword = '123';
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const username = 'dsantos@ctdi.com';
+    const newPassword = 'nova@2026';
+    const hashedPassword = '$2b$10$Z.R2G8RieJ/dDvx9JNLoyO0vHBxzRuwZp8S337StfyLvtstKBJHEO';
 
-    console.log(`Generating new hash for user: ${username}`);
+    console.log(`Generating reset for user: ${username}`);
     console.log(`New Hash: ${hashedPassword}`);
 
     try {
