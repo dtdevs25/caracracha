@@ -10,7 +10,7 @@ const minioClient = new Minio.Client({
     useSSL: process.env.MINIO_USE_SSL === 'true',
     accessKey: process.env.MINIO_ACCESS_KEY || '',
     secretKey: process.env.MINIO_SECRET_KEY || '',
-    region: 'us-east-1',
+    region: process.env.MINIO_REGION_NAME || 'us-east-1',
     transport: {
         request: (options: any, callback: any) => {
             options.agent = new https.Agent({ rejectUnauthorized: false });
@@ -23,20 +23,30 @@ const bucketName = process.env.MINIO_BUCKET_NAME || 'caracracha-desing';
 
 export const initializeMinio = async () => {
     try {
-        console.log(`Checking bucket: ${bucketName}...`);
+        console.log(`Checking bucket: ${bucketName} in region: ${process.env.MINIO_REGION_NAME || 'us-east-1'}...`);
         const exists = await minioClient.bucketExists(bucketName);
         if (!exists) {
-            await minioClient.makeBucket(bucketName, 'us-east-1');
+            await minioClient.makeBucket(bucketName, process.env.MINIO_REGION_NAME || 'us-east-1');
             console.log(`Bucket ${bucketName} created.`);
         } else {
             console.log(`Bucket ${bucketName} already exists.`);
         }
     } catch (error: any) {
         console.error('CRITICAL MinIO Error:');
-        console.error('Message:', error.message);
-        console.error('Code:', error.code);
-        console.error('S3 Error:', JSON.stringify(error, null, 2));
-        // Don't throw to allow server to start, but it will fail on upload
+        if (error.name === 'S3Error' || error.code) {
+            console.error('Error Details:', {
+                name: error.name,
+                code: error.code,
+                message: error.message,
+                region: error.region,
+                amzRequestid: error.amzRequestid,
+                amzId2: error.amzId2,
+                status: error.status,
+                statusCode: error.statusCode
+            });
+        } else {
+            console.error('Raw Error:', error);
+        }
     }
 };
 
