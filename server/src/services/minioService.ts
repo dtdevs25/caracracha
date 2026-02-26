@@ -19,7 +19,7 @@ const minioClient = new Minio.Client({
     }
 } as any);
 
-const bucketName = process.env.MINIO_BUCKET_NAME || 'caracracha-desing';
+const bucketName = process.env.MINIO_BUCKET_NAME || 'caracracha-design';
 
 export const initializeMinio = async () => {
     try {

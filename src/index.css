@@ -273,8 +273,8 @@ label {
 .zoom-controls {
   position: fixed;
   bottom: 2rem;
-  left: calc(50% + 4.25rem);
-  /* Offset to compensate for sidebar */
+  left: calc(50% - 8rem);
+  /* Adjust to align with the badge, compensating for the right property panel */
   display: flex;
   align-items: center;
   gap: 1.5rem;
