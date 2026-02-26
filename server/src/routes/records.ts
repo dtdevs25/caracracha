@@ -30,15 +30,16 @@ router.post('/:templateId', authenticate, async (req: AuthRequest, res) => {
             return res.status(400).json({ error: 'Records must be an array' });
         }
 
-        const result = await prisma.$transaction(async (tx) => {
+        const result = await prisma.$transaction(async (tx: any) => {
+            const id = req.params.templateId as string;
             // Delete existing records for this template
-            await tx.batchRecord.deleteMany({ where: { templateId } });
+            await tx.batchRecord.deleteMany({ where: { templateId: id } });
 
             // Create new records
             if (records.length > 0) {
                 return await tx.batchRecord.createMany({
                     data: records.map((r: any) => ({
-                        templateId,
+                        templateId: id,
                         data: r.data || {}
                     }))
                 });
