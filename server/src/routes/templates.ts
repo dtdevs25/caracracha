@@ -71,11 +71,17 @@ router.post('/', authenticate, async (req: AuthRequest, res) => {
             ownerId: req.user!.id
         };
 
-        const template = await prisma.badgeTemplate.upsert({
-            where: { id: id || '00000000-0000-0000-0000-000000000000' },
-            update: data,
-            create: data
-        });
+        let template;
+        if (id) {
+            template = await prisma.badgeTemplate.update({
+                where: { id },
+                data
+            });
+        } else {
+            template = await prisma.badgeTemplate.create({
+                data
+            });
+        }
 
         res.json(template);
     } catch (error) {
