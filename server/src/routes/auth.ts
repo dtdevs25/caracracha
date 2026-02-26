@@ -12,11 +12,21 @@ router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
     try {
+        console.log(`Login attempt for username: ${username}`);
         const user = await prisma.user.findUnique({ where: { username } });
 
-        if (!user || !(await bcrypt.compare(password, user.password))) {
+        if (!user) {
+            console.log(`User not found: ${username}`);
             return res.status(401).json({ error: 'Invalid username or password' });
         }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            console.log(`Invalid password for user: ${username}`);
+            return res.status(401).json({ error: 'Invalid username or password' });
+        }
+
+        console.log(`Login successful for user: ${username}`);
 
         const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
 
