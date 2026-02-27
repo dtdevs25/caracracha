@@ -7,31 +7,32 @@ import { BadgeTemplate, BatchRecord } from '../types';
 export async function renderBadgeToCanvas(
     template: BadgeTemplate,
     record?: BatchRecord,
-    options: { side: 'front' | 'back'; includeBleed: boolean; rotate180?: boolean } = { side: 'front', includeBleed: true }
+    options: { side: 'front' | 'back'; includeBleed: boolean; rotate180?: boolean; renderScale?: number } = { side: 'front', includeBleed: true, renderScale: 1.0 }
 ): Promise<HTMLCanvasElement> {
-    const { side, includeBleed, rotate180 } = options;
+    const { side, includeBleed, rotate180, renderScale = 1.0 } = options;
     const sideData = template[side];
 
-    // Dimensions @ 300 DPI
+    // Dimensions @ 300 DPI (Base)
     const isVertical = template.orientation === 'vertical';
-    const baseWidth = isVertical ? 638 : 1011;
-    const baseHeight = isVertical ? 1011 : 638;
+    const baseWidth = (isVertical ? 638 : 1011);
+    const baseHeight = (isVertical ? 1011 : 638);
 
     // Fix: Ensure bleed is always numeric
     const bleed = includeBleed ? (template.bleed || 0) : 0;
 
-    const width = baseWidth + (bleed * 2);
-    const height = baseHeight + (bleed * 2);
-
-    // Designer uses the same base dimensions (638x1011), so scale is 1:1
-    const renderScale = 1.0;
+    const width = (baseWidth + (bleed * 2)) * renderScale;
+    const height = (baseHeight + (bleed * 2)) * renderScale;
 
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: true });
 
     if (!ctx) throw new Error('Could not get canvas context');
+
+    // High quality rendering
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
 
     ctx.save();
     if (rotate180) {
@@ -75,11 +76,11 @@ export async function renderBadgeToCanvas(
 
     // 2. Setup Coordinate System & Global Clipping
     // Move origin to physical card corner (after bleed)
-    ctx.translate(bleed, bleed);
+    ctx.translate(bleed * renderScale, bleed * renderScale);
 
     // Apply Clipping Mask (CR80 boundaries)
     ctx.beginPath();
-    ctx.rect(0, 0, baseWidth, baseHeight);
+    ctx.rect(0, 0, baseWidth * renderScale, baseHeight * renderScale);
     ctx.clip();
 
     // 2. Draw Layers
@@ -98,9 +99,9 @@ export async function renderBadgeToCanvas(
             }
 
             ctx.save();
-            const lx = layer.x;
-            const ly = layer.y;
-            const fontSize = layer.fontSize;
+            const lx = layer.x * renderScale;
+            const ly = layer.y * renderScale;
+            const fontSize = layer.fontSize * renderScale;
 
             // 1. Set font first to measure correctly
             const fontStr = `${layer.fontWeight} ${fontSize}px "${layer.fontFamily}"`;
@@ -130,10 +131,10 @@ export async function renderBadgeToCanvas(
                 try {
                     const img = await loadImage(src);
                     ctx.save();
-                    const lx = layer.x;
-                    const ly = layer.y;
-                    const lw = layer.width || 100;
-                    const lh = layer.height || 100;
+                    const lx = layer.x * renderScale;
+                    const ly = layer.y * renderScale;
+                    const lw = (layer.width || 100) * renderScale;
+                    const lh = (layer.height || 100) * renderScale;
 
                     // Handle Rotation
                     if (layer.rotation) {
@@ -208,12 +209,12 @@ export async function renderBadgeToCanvas(
             }
         } else if (layer.type === 'square' || layer.type === 'circle' || layer.type === 'triangle' || layer.type === 'line') {
             ctx.save();
-            const x = layer.x;
-            const y = layer.y;
-            const w = layer.width || 100;
-            const h = layer.height || 100;
-            const borderWidth = layer.borderWidth || 0;
-            const borderRadius = layer.borderRadius || 0;
+            const x = layer.x * renderScale;
+            const y = layer.y * renderScale;
+            const w = (layer.width || 100) * renderScale;
+            const h = (layer.height || 100) * renderScale;
+            const borderWidth = (layer.borderWidth || 0) * renderScale;
+            const borderRadius = (layer.borderRadius || 0) * renderScale;
 
             // Handle Rotation
             if (layer.rotation) {

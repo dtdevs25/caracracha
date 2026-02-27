@@ -28,22 +28,23 @@ export async function generateBadgesPDF(
         const record = records[i];
 
         // Front Side
-        const frontCanvas = await renderBadgeToCanvas(template, record, { side: 'front', includeBleed: true });
-        const frontData = frontCanvas.toDataURL('image/jpeg', 0.95);
+        const frontCanvas = await renderBadgeToCanvas(template, record, { side: 'front', includeBleed: true, renderScale: 2.0 });
+        const frontData = frontCanvas.toDataURL('image/png');
 
         if (i > 0) doc.addPage([docWidth, docHeight], isVertical ? 'portrait' : 'landscape');
-        doc.addImage(frontData, 'JPEG', 0, 0, docWidth, docHeight);
+        doc.addImage(frontData, 'PNG', 0, 0, docWidth, docHeight);
 
         // Back Side - Rotated 180 for Zebra ZC300
         const backCanvas = await renderBadgeToCanvas(template, record, {
             side: 'back',
             includeBleed: true,
-            rotate180: true
+            rotate180: true,
+            renderScale: 2.0
         });
-        const backData = backCanvas.toDataURL('image/jpeg', 0.95);
+        const backData = backCanvas.toDataURL('image/png');
 
         doc.addPage([docWidth, docHeight], isVertical ? 'portrait' : 'landscape');
-        doc.addImage(backData, 'JPEG', 0, 0, docWidth, docHeight);
+        doc.addImage(backData, 'PNG', 0, 0, docWidth, docHeight);
 
         if (onProgress) {
             onProgress(Math.round(((i + 1) / records.length) * 100));

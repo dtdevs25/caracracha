@@ -33,9 +33,13 @@ const DESIGNER_STYLES = `
     justify-content: center;
     position: relative;
     overflow: auto;
-    padding: 3rem;
-    padding-left: 10rem;
-    padding-bottom: 8rem;
+    padding: 0;
+    margin: 0;
+  }
+  img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: high-quality;
+    -ms-interpolation-mode: bicubic;
   }
   .scene {
     position: relative;
@@ -84,7 +88,6 @@ const DESIGNER_STYLES = `
     z-index: 50;
   }
 
-  .tools-panel {
     width: 72px;
     background: white;
     border: 1px solid var(--border-color);
@@ -95,8 +98,12 @@ const DESIGNER_STYLES = `
     align-items: center;
     padding: 1.5rem 0;
     gap: 0.5rem;
-    margin: 0 1.5rem;
-    height: 600px;
+    position: absolute;
+    left: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    height: auto;
+    max-height: 80vh;
     z-index: 60;
   }
 
@@ -109,8 +116,12 @@ const DESIGNER_STYLES = `
     display: flex;
     flex-direction: column;
     padding: 1.25rem;
-    margin: 0 1.5rem;
-    height: 600px;
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    height: auto;
+    max-height: 80vh;
     overflow-y: auto;
     z-index: 60;
   }
@@ -611,15 +622,15 @@ export default function BadgeDesigner({
         }}>
             <style>{DESIGNER_STYLES}</style>
 
-            {/* Workspace */}
+            {/* Workspace - Centered in viewport */}
             <div className="workspace" style={{
-                padding: minimal ? '0' : '3rem',
-                paddingLeft: minimal ? '0' : '10rem',
                 flex: 1,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: 'transparent'
+                background: 'transparent',
+                width: '100%',
+                height: '100%'
             }}>
                 <div className="scene" ref={sceneRef} style={{ width: baseWidth * scale, height: baseHeight * scale }}>
                     <div className={`card ${isFlipped ? 'is-flipped' : ''}`}>

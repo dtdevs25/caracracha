@@ -273,7 +273,7 @@ label {
 .zoom-controls {
   position: fixed;
   bottom: 2rem;
-  left: calc(50% - 130px);
+  left: 50%;
   /* 130px = (PanelWidth ~368px - SidebarWidth ~108px) / 2 */
   transform: translateX(-50%);
   display: flex;
